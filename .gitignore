@@ -34,3 +34,23 @@
 build-client-Desktop_Qt_6_5_0_MinGW_64_bit-Debug/
 
 build-server-Desktop_Qt_6_5_0_MinGW_64_bit-Debug/
+
+client/.qtc_clangd/
+
+build-client-Desktop_Qt_6_5_0_MinGW_64_bit-Release/
+
+client/.qmake.stash
+
+client/Makefile
+
+client/Makefile.Debug
+
+client/Makefile.Release
+
+client/release/
+
+client/ui_mainwindow_client.h
+
+client/debug/moc_predefs.h
+
+client/debug/
