@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include<QTcpSocket>
+#include<QTime>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -28,6 +29,7 @@ private:
     QTcpSocket *socket;
     QByteArray Data;
     void SendToServer(QString str);
+    quint16 nextBlockSize; // определяет размер передаваемого блока(2 байта)
 
 public slots:
     void slotReadyRead();
