@@ -32,7 +32,8 @@ void Server::slotReadyRead()
     {
         qDebug() << "Read...";
         QString str;
-        in >> str;
+        QTime time;
+        in >> time >>str;
         qDebug() << str;
         SendToClient(str);
     }
@@ -47,7 +48,7 @@ void Server::SendToClient(QString str)
     Data.clear();
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_5);
-    out << str;
+    out << QTime::currentTime() << str;
    // socket->write(Data);
     for(int i = 0; i < Sockets.size(); i++)
     {

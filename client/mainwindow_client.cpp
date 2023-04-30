@@ -1,5 +1,5 @@
 #include "mainwindow_client.h"
-#include "ui_mainwindow.h"
+#include "ui_mainwindow_client.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -27,7 +27,7 @@ void MainWindow::SendToServer(QString str)
     Data.clear();
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_5);
-    out << str;
+    out << QTime::currentTime() <<str;
     socket->write(Data);
     ui->lineEdit->clear();
 }
@@ -39,8 +39,9 @@ void MainWindow::slotReadyRead()
     if(in.status() == QDataStream::Ok)
     {
         QString str;
-        in >> str;
-        ui->textBrowser->append(str);
+        QTime time;
+        in >> time >> str;
+        ui->textBrowser->append(time.toString() + "\n" +str);
     }
     else
     {
