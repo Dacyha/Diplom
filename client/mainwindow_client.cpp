@@ -9,7 +9,6 @@ MainWindow::MainWindow(QWidget *parent)
     socket = new QTcpSocket(this);
     connect(socket, &QTcpSocket::readyRead, this, &MainWindow::slotReadyRead);
     connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);
-    nickNameTest="chel1";
 }
 
 MainWindow::~MainWindow()
@@ -58,6 +57,10 @@ void MainWindow::slotReadyRead()
     }
 }
 
+void MainWindow::readNickName(QString nick)
+{
+    nickNameTest=nick;
+}
 
 void MainWindow::on_pushButton_2_clicked()
 {

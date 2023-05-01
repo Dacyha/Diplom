@@ -33,5 +33,7 @@ private:
 
 public slots:
     void slotReadyRead();
+
+    void readNickName(QString nick);
 };
 #endif // MAINWINDOW_CLIENT_H
