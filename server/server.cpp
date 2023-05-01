@@ -33,9 +33,11 @@ void Server::slotReadyRead()
         qDebug() << "Read...";
         QString str;
         QTime time;
-        in >> time >>str;
-        qDebug() << str;
-        SendToClient(str);
+        QString nickNameTest;
+        in >> time >> nickNameTest >> str;
+        qDebug() << nickNameTest <<": "<< str;
+        qDebug() << socket;
+        SendToClient(str, nickNameTest);
     }
     else
     {
@@ -43,12 +45,12 @@ void Server::slotReadyRead()
     }
 }
 
-void Server::SendToClient(QString str)
+void Server::SendToClient(QString str, QString nickNameTest)
 {
     Data.clear();
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_5);
-    out << QTime::currentTime() << str;
+    out << QTime::currentTime() << nickNameTest << str;
    // socket->write(Data);
     for(int i = 0; i < Sockets.size(); i++)
     {

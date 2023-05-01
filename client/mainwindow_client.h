@@ -28,7 +28,8 @@ private:
     Ui::MainWindow *ui;
     QTcpSocket *socket;
     QByteArray Data;
-    void SendToServer(QString str);
+    QString nickNameTest;
+    void SendToServer(QString str, QString nickNameTest);
 
 public slots:
     void slotReadyRead();

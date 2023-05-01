@@ -15,7 +15,8 @@ public:
 private:
     QVector <QTcpSocket*> Sockets;
     QByteArray Data;
-    void SendToClient(QString str);
+    //QString nickNameTest;
+    void SendToClient(QString str, QString nickNameTest);
 public slots:
     void incomingConnection(qintptr socketDescriptor);
     void slotReadyRead();

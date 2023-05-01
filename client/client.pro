@@ -13,7 +13,8 @@ SOURCES += \
     mainwindow_client.cpp
 
 HEADERS += \
-    mainwindow_client.h
+    mainwindow_client.h\
+    ui_mainwindow_client.h
 
 FORMS += \
     mainwindow_client.ui
