@@ -9,27 +9,34 @@ MainWindow::MainWindow(QWidget *parent)
     socket = new QTcpSocket(this);
     connect(socket, &QTcpSocket::readyRead, this, &MainWindow::slotReadyRead);
     connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);
+    socket->connectToHost("127.0.0.1", 8888);
 }
 
 MainWindow::~MainWindow()
 {
+    //socket->close();
     delete ui;
 }
 
-
-void MainWindow::on_pushButton_clicked()
+void MainWindow::SendToServer(QString str, QString myNickName)
 {
-    socket->connectToHost("127.0.0.1", 8888);
-}
-
-void MainWindow::SendToServer(QString str, QString nickNameTest)
-{
+    QString sendCode = "2";
     Data.clear();
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_5);
-    out << QTime::currentTime() << nickNameTest << str;
+    out << sendCode << QTime::currentTime() << myNickName << str;
     socket->write(Data);
     ui->lineEdit->clear();
+}
+
+void MainWindow::SendToServerNickName(QString myNickName)
+{
+    QString sendCode = "1";
+    Data.clear();
+    QDataStream out(&Data, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_6_5);
+    out << sendCode  << myNickName;
+    socket->write(Data);
 }
 
 void MainWindow::slotReadyRead()
@@ -40,15 +47,30 @@ void MainWindow::slotReadyRead()
     {
         QString str;
         QTime time;
-        QString nickNameTest1;
-        in >> time >> nickNameTest1 >> str;
-        if (nickNameTest1 == nickNameTest){
-            ui->textBrowser->append(time.toString() + "\n" + "Я: "+ str+ "\n");
-            }
-        else if (nickNameTest1 != nickNameTest){
-            ui->textBrowser->append(time.toString() + "\n" + nickNameTest1 +": "+ str+ "\n");
-        }
+        QString nickNameClient;
+        QString readCode;
+         in >>  readCode;
+         switch (readCode.toInt()) {
+            case 1:
+                ui->textBrowser->append("code 1");//заменить
 
+                break;
+         case 2:
+                in >> time >> nickNameClient >> str;
+                //QTcpSocket *socketRead = (QTcpSocket*)sender();
+                if (myNickName == nickNameClient)
+                {
+                    ui->textBrowser->append(time.toString() + "\n" + "Я: "+ str+ "\n");
+                }
+                else if (myNickName != nickNameClient)
+                {
+                    ui->textBrowser->append(time.toString() + "\n" + nickNameClient +": "+ str+ "\n");
+                }
+                break;
+         default:
+                    ui->textBrowser->append("error");//заменить
+                break;
+         }
 
     }
     else
@@ -59,17 +81,29 @@ void MainWindow::slotReadyRead()
 
 void MainWindow::readNickName(QString nick)
 {
-    nickNameTest=nick;
+    myNickName=nick;
+    SendToServerNickName(myNickName);
+    QMap<QString, QTcpSocket*> forTable;
+    forTable.insert(myNickName, socket);
+    EditTable(forTable);
+}
+
+void MainWindow::EditTable(QMap<QString, QTcpSocket*> forTable)
+{
+    QTableWidgetItem *newItem = new QTableWidgetItem();
+    //QString oleg = forTable.key(socket);
+    newItem->setText(forTable.key(socket));
+    ui->tableWidget->setItem(0,0, newItem);
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    SendToServer(ui->lineEdit->text(), nickNameTest);
+    SendToServer(ui->lineEdit->text(), myNickName);
 }
 
 
 void MainWindow::on_lineEdit_returnPressed()
 {
-    SendToServer(ui->lineEdit->text(), nickNameTest);
+    on_pushButton_2_clicked();
 }
 

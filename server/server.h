@@ -4,6 +4,7 @@
 #include<QTcpSocket>
 #include <QVector>
 #include<QTime>
+#include <QMap>
 
 class Server : public QTcpServer
 {
@@ -11,12 +12,13 @@ class Server : public QTcpServer
 
 public:
     Server();
+    QTcpSocket *socketRead;
     QTcpSocket *socket;
 private:
     QVector <QTcpSocket*> Sockets;
     QByteArray Data;
-    //QString nickNameTest;
-    void SendToClient(QString str, QString nickNameTest);
+    void SendToClient(QString str, QString nickNameClient);
+    void BuildClientDB(QString nickNameClient);
 public slots:
     void incomingConnection(qintptr socketDescriptor);
     void slotReadyRead();
