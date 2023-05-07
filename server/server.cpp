@@ -1,4 +1,5 @@
 #include "server.h"
+#include<QDataStream>
 
 Server::Server()
 {
@@ -17,9 +18,8 @@ void Server::incomingConnection(qintptr socketDescriptor)
     socket = new QTcpSocket;
     socket->setSocketDescriptor(socketDescriptor);
     connect(socket, &QTcpSocket::readyRead, this, &Server::slotReadyRead);
-    connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);
+    connect(socket, &QTcpSocket::disconnected, this, &Server::disconnectClent);
 
-    Sockets.push_back(socket);
     qDebug() << "client connected" << socketDescriptor;
 }
 
@@ -29,13 +29,12 @@ void Server::slotReadyRead()
     //QByteArray  readCode = socket->read(6);
     //qDebug() << readCode.toInt();
     QDataStream in(socketRead);
-    in.setVersion(QDataStream::Qt_6_5);
+    in.setVersion(QDataStream::Qt_5_12);
     if(in.status() == QDataStream::Ok)
     {
         qDebug() << "Read...";
         QString str;
         QTime time;
-        QString nickNameClient;
         QString  readCode;
         in >>  readCode;
         qDebug() << "Read code:" << readCode.toInt()  ;
@@ -44,12 +43,12 @@ void Server::slotReadyRead()
             case 1:
                 in >> nickNameClient;
                 qDebug() <<"Client connected: "<< nickNameClient<<" sockets: "<< socketRead;
-                BuildClientDB(nickNameClient);
+                BuildClientDB();
                 break;
             case 2:
                 in >> time >> nickNameClient >> str;
                 qDebug()<< "Client send message: " << time  << nickNameClient <<": "<< str << socketRead;
-                SendToClient(str, nickNameClient);
+                SendToClient(str);
                 break;
             default:
                 qDebug() << "slotReadyRead Error";
@@ -62,31 +61,72 @@ void Server::slotReadyRead()
     }
 }
 
-void Server::BuildClientDB(QString nickNameClient)
+void Server::BuildClientDB()
 {
-        QMap<QString, QTcpSocket*> Clients;
         Clients.insert(nickNameClient, socketRead);
-        qDebug() << "QMap v dorabotke"<< nickNameClient <<  socketRead;
+        qDebug() << nickNameClient <<  socketRead;
+        SendClientDB();
 }
 
-void Server::SendToClient(QString str, QString nickNameClient)
+void Server::disconnectClent()
 {
-   QString sendCode = "2";
+    QTcpSocket* clientDisconnect = qobject_cast<QTcpSocket*>(sender());
+    if(clientDisconnect)
+    {
+        qDebug() << "Client disconnected" << nickNameClient <<  socketRead;
+        clientDisconnect->deleteLater();
+        Clients.remove(nickNameClient);
+        SendClientDB();
+    }
+    else
+    {
+       qDebug() << "Client disconnected error";
+    }
+}
+
+void Server::SendClientDB()
+{
+    QString sendCode = "1";
     Data.clear();
     QDataStream out(&Data, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_6_5);
+    out.setVersion(QDataStream::Qt_5_12);
+    if(out.status() == QDataStream::Ok)
+    {
+        //out << sendCode;
+       out << sendCode;
+        foreach(QString nickNameClient, Clients.keys())
+        {
+            QString sendNick = Clients.key(socketRead);
+            out  << sendCode << Clients.size()  << sendNick;
+            Clients.value(nickNameClient)->write(Data);
+        }
+        qDebug() << "SendCode:" << sendCode << "update table";
+    }
+    else
+    {
+        qDebug() << "DataStream error";
+    }
+}
+
+void Server::SendToClient(QString str)
+{
+    QString sendCode = "2";
+    Data.clear();
+    QDataStream out(&Data, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_12);
     if(out.status() == QDataStream::Ok)
     {
         out << sendCode << QTime::currentTime() << nickNameClient << str;
         qDebug() << "all sockets: ";
-        for(int i = 0; i < Sockets.size(); i++)
+
+        foreach(QString nickNameClient, Clients.keys())
         {
-            Sockets[i]->write(Data);
-            qDebug() << i <<" socket: "<< Sockets[i];
+            Clients.value(nickNameClient)->write(Data);
+            qDebug() << Clients.value(nickNameClient);
         }
     }
     else
     {
-    qDebug() << "DataStream error";
+        qDebug() << "DataStream error";
     }
 }

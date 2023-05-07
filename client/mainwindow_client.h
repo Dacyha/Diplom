@@ -28,9 +28,10 @@ private:
     QTcpSocket *socket;
     QByteArray Data;
     QString myNickName;
+    QMap<QString, QTcpSocket*> forTable;
     void SendToServer(QString str, QString myNickName);
     void SendToServerNickName(QString myNickName);
-    void EditTable( QMap<QString, QTcpSocket*> forTable);
+    void EditTable();
 
 public slots:
     void slotReadyRead();

@@ -24,3 +24,9 @@ void RegistrationWindow::on_pushButton_clicked()
     this->close();
 }
 
+
+void RegistrationWindow::on_lineEdit_returnPressed()
+{
+    on_pushButton_clicked();
+}
+

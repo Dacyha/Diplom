@@ -2,7 +2,6 @@
 #define SERVER_H
 #include <QTcpServer>
 #include<QTcpSocket>
-#include <QVector>
 #include<QTime>
 #include <QMap>
 
@@ -17,11 +16,15 @@ public:
 private:
     QVector <QTcpSocket*> Sockets;
     QByteArray Data;
-    void SendToClient(QString str, QString nickNameClient);
-    void BuildClientDB(QString nickNameClient);
+    QMap<QString, QTcpSocket*> Clients;
+    QString nickNameClient;
+    void SendToClient(QString str);
+    void BuildClientDB();
+    void SendClientDB();
 public slots:
     void incomingConnection(qintptr socketDescriptor);
     void slotReadyRead();
+    void disconnectClent();
 };
 
 #endif // SERVER_H
