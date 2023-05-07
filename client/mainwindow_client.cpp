@@ -64,48 +64,24 @@ void MainWindow::slotReadyRead()
         QTime time;
         QString nickNameClient;
         QString readCode;
-        qint64 TableSize;
-        //qint64 it;
-        //QList<QString> oleg;
-        QString oleg;
+        qint64 it;
+        QList<QString> olegT;
          in >>  readCode;
          switch (readCode.toInt()) {
             case 1:
-
-             in  >>  readCode >> TableSize >> oleg;
-             ui->textBrowser->append("code 1");//заменить
-             ui->textBrowser->append(oleg);//заменить
-/*
-             for(auto it=1; it!=TableSize; it++)
+             in >> olegT;
+             ui->tableWidget->setRowCount(olegT.size());
+             it = 0;
+             foreach(QString nickNameClient, olegT )
              {
-                 in >>TableSize >> nickNameClient;
-                 ui->textBrowser->append("code 1");//заменить
-                 ui->textBrowser->append(nickNameClient);//заменить
+                 QTableWidgetItem *newItem = new QTableWidgetItem();
+                 newItem->setText(nickNameClient);
+                 ui->tableWidget->setItem(0,it, newItem);
+                 it++;
              }
-                it = 1;
-                do{
-                  in >>  readCode >> TableSize >> nickNameClient;
-                  ui->textBrowser->append("code 1");//заменить
-                  ui->textBrowser->append(nickNameClient);//заменит
-             } while (it !=TableSize);
-                */
-
-
-
-
-                //ui->tableWidget->setRowCount(forTable.keys().size());
-                //foreach(QString nickNameClient, forTable.keys())
-                //{
-                    //Clients.value(nickNameClient)->write(Data);
-                    //ui->textBrowser->append(forTable.key(nickNameClient).toStdString());//заменить
-                    //QTableWidgetItem *newItem = new QTableWidgetItem();
-                    //QString oleg = forTable.key(socket);
-                    //newItem->setText(forTable.key(socket));
-                    //ui->tableWidget->setItem(0,0, newItem);
-                    //qDebug() << Clients.value(nickNameClient);
-                //}
                 break;
             case 2:
+
                 in >> time >> nickNameClient >> str;
                 //QTcpSocket *socketRead = (QTcpSocket*)sender();
                 if (myNickName == nickNameClient)

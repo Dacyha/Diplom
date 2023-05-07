@@ -73,8 +73,9 @@ void Server::disconnectClent()
     QTcpSocket* clientDisconnect = qobject_cast<QTcpSocket*>(sender());
     if(clientDisconnect)
     {
-        qDebug() << "Client disconnected" << nickNameClient <<  socketRead;
         clientDisconnect->deleteLater();
+        nickNameClient = Clients.key(clientDisconnect);
+        qDebug() << "Client disconnected" << nickNameClient <<  socketRead;
         Clients.remove(nickNameClient);
         SendClientDB();
     }
@@ -92,12 +93,12 @@ void Server::SendClientDB()
     out.setVersion(QDataStream::Qt_5_12);
     if(out.status() == QDataStream::Ok)
     {
-        //out << sendCode;
-       out << sendCode;
-        foreach(QString nickNameClient, Clients.keys())
+       QList<QString> OlegT;
+       OlegT.clear();
+       OlegT.append(Clients.keys());
+       out << sendCode << OlegT;
+       foreach(QString nickNameClient, Clients.keys())
         {
-            QString sendNick = Clients.key(socketRead);
-            out  << sendCode << Clients.size()  << sendNick;
             Clients.value(nickNameClient)->write(Data);
         }
         qDebug() << "SendCode:" << sendCode << "update table";
