@@ -93,10 +93,10 @@ void Server::SendClientDB()
     out.setVersion(QDataStream::Qt_5_12);
     if(out.status() == QDataStream::Ok)
     {
-       QList<QString> OlegT;
-       OlegT.clear();
-       OlegT.append(Clients.keys());
-       out << sendCode << OlegT;
+       QList<QString> clientTable;
+       clientTable.clear();
+       clientTable.append(Clients.keys());
+       out << sendCode << clientTable;
        foreach(QString nickNameClient, Clients.keys())
         {
             Clients.value(nickNameClient)->write(Data);

@@ -11,6 +11,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(socket, &QTcpSocket::readyRead, this, &MainWindow::slotReadyRead);
     connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);
     socket->connectToHost("127.0.0.1", 8888);
+
+    ui->tableWidget->verticalHeader()->hide();// перенести в подобающее место(туда где буду настраивать размер элементов)
+    ui->tableWidget->horizontalHeader()->hide();// перенести в подобающее место
 }
 
 MainWindow::~MainWindow()
@@ -25,7 +28,7 @@ void MainWindow::SendToServer(QString str, QString myNickName)
     Data.clear();
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_12);
-    if(out.status() == QDataStream::Ok)
+    if(out.status() == QDataStream::Ok && str != "")
     {
         out << sendCode << QTime::currentTime() << myNickName << str;
         socket->write(Data);
@@ -33,7 +36,7 @@ void MainWindow::SendToServer(QString str, QString myNickName)
     }
     else
     {
-         ui->textBrowser->append("read error");
+         ui->textBrowser->append("read error");// убрать
     }
 }
 
@@ -65,14 +68,14 @@ void MainWindow::slotReadyRead()
         QString nickNameClient;
         QString readCode;
         qint64 it;
-        QList<QString> olegT;
+        QList<QString> clientTable;
          in >>  readCode;
          switch (readCode.toInt()) {
             case 1:
-             in >> olegT;
-             ui->tableWidget->setRowCount(olegT.size());
+             in >> clientTable;
+             ui->tableWidget->setRowCount(clientTable.size());
              it = 0;
-             foreach(QString nickNameClient, olegT )
+             foreach(QString nickNameClient, clientTable )
              {
                  QTableWidgetItem *newItem = new QTableWidgetItem();
                  newItem->setText(nickNameClient);
@@ -131,5 +134,12 @@ void MainWindow::on_pushButton_2_clicked()
 void MainWindow::on_lineEdit_returnPressed()
 {
     on_pushButton_2_clicked();
+}
+
+
+void MainWindow::on_tableWidget_cellDoubleClicked(int row, int column)
+{
+    QString nickNameClient = ui->tableWidget->item(row,column)->text();//заготовочка
+     ui->textBrowser->append(nickNameClient);
 }
 

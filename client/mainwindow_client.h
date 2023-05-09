@@ -23,12 +23,14 @@ private slots:
 
     void on_lineEdit_returnPressed();
 
+    void on_tableWidget_cellDoubleClicked(int row, int column);
+
 private:
     Ui::MainWindow *ui;
     QTcpSocket *socket;
     QByteArray Data;
     QString myNickName;
-    QMap<QString, QTcpSocket*> forTable;
+   //QMap<QString, QTcpSocket*> forTable;
     void SendToServer(QString str, QString myNickName);
     void SendToServerNickName(QString myNickName);
     void EditTable();
