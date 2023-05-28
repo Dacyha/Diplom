@@ -5,6 +5,8 @@
 #include<QTcpSocket>
 #include<QTime>
 #include<QMap>
+#include<QSettings>
+#include<QList>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,6 +19,9 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+    void saveSettings();
+    void loadSettings();
 
 private slots:
     void on_pushButton_2_clicked();
@@ -31,6 +36,7 @@ private:
     QByteArray Data;
     QString myNickName;
    //QMap<QString, QTcpSocket*> forTable;
+    QSettings* settings;
     void SendToServer(QString str, QString myNickName);
     void SendToServerNickName(QString myNickName);
     void EditTable();

@@ -1,12 +1,15 @@
 #include "mainwindow_client.h"
 #include "ui_mainwindow_client.h"
-#include<QList>
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent):
+    QMainWindow(parent),
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    settings = new QSettings("settings.ini", QSettings::IniFormat,  this);
+    loadSettings();
+
     socket = new QTcpSocket(this);
     connect(socket, &QTcpSocket::readyRead, this, &MainWindow::slotReadyRead);
     connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);
@@ -18,8 +21,19 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    saveSettings();
     socket->disconnectFromHost();
     delete ui;
+}
+
+void MainWindow::saveSettings()
+{
+    settings->setValue("geometry", geometry());
+}
+
+void MainWindow::loadSettings()
+{
+    setGeometry(settings->value("geometry", QRect(300, 300, 300, 300)).toRect());
 }
 
 void MainWindow::SendToServer(QString str, QString myNickName)
@@ -111,9 +125,11 @@ void MainWindow::slotReadyRead()
 void MainWindow::readNickName(QString nick)//с 1-го окна
 {
     myNickName=nick;
+    setWindowTitle(myNickName);
     SendToServerNickName(myNickName);
+
     //QMap<QString, QTcpSocket*> forTable;
-    //forTable.insert(myNickName, socket);
+   // forTable.insert(myNickName, socket);
     //EditTable();
 }
 

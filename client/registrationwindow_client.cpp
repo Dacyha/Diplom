@@ -6,24 +6,41 @@ RegistrationWindow::RegistrationWindow(QWidget *parent) :
     ui(new Ui::RegistrationWindow)
 {
     ui->setupUi(this);
-    mainWindow = new MainWindow;
 
+    settings = new QSettings("settings.ini", QSettings::IniFormat,  this);
+    loadSettings();
+    mainWindow = new MainWindow;
     connect(this, &RegistrationWindow::sendNickName, mainWindow, &MainWindow::readNickName);
+    if (myNickName != "")
+    {
+        ui->lineEdit->setText(myNickName);
+    }
 }
 
 RegistrationWindow::~RegistrationWindow()
 {
+    saveSettings();
     delete ui;
+}
+
+void RegistrationWindow::saveSettings()
+{
+    settings->setValue("nick_name", myNickName);
+}
+
+void RegistrationWindow::loadSettings()
+{
+    myNickName = (settings->value("nick_name", "").toString());
 }
 
 void RegistrationWindow::on_pushButton_clicked()
 {
-    emit sendNickName(ui->lineEdit->text());
+    myNickName = ui->lineEdit->text();
+    emit sendNickName(myNickName);
     ui->lineEdit->clear();
     mainWindow->show();
     this->close();
 }
-
 
 void RegistrationWindow::on_lineEdit_returnPressed()
 {

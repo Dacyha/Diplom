@@ -16,6 +16,9 @@ public:
     explicit RegistrationWindow(QWidget *parent = nullptr);
     ~RegistrationWindow();
 
+    void saveSettings();
+    void loadSettings();
+
 private slots:
     void on_pushButton_clicked();
 
@@ -24,6 +27,9 @@ private slots:
 private:
     Ui::RegistrationWindow *ui;
     MainWindow *mainWindow;
+
+    QSettings* settings;
+    QString myNickName;
 
 signals:
     void sendNickName(QString);
