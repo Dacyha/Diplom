@@ -1,12 +1,15 @@
 #include "mainwindow_client.h"
 #include "ui_mainwindow_client.h"
-#include<QList>
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent):
+    QMainWindow(parent),
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    settings = new QSettings("D:/qt project/Diplom/client/settings.ini", QSettings::IniFormat,  this);
+    loadSettings();
+
     socket = new QTcpSocket(this);
     connect(socket, &QTcpSocket::readyRead, this, &MainWindow::slotReadyRead);
     connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);
@@ -18,8 +21,24 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    saveSettings();
     socket->disconnectFromHost();
     delete ui;
+}
+
+void MainWindow::saveSettings()
+{
+    //settings->beginGroup(objectName());
+    settings->setValue("geometry", geometry());
+    //settings->endGroup();
+}
+
+void MainWindow::loadSettings()
+{
+     //settings->beginGroup(objectName());
+     setGeometry(settings->value("geometry", QRect(300, 300, 300, 300)).toRect());
+     //setGeometry(QRect(600, 300, 600, 600));
+     //settings->endGroup();
 }
 
 void MainWindow::SendToServer(QString str, QString myNickName)
@@ -111,9 +130,11 @@ void MainWindow::slotReadyRead()
 void MainWindow::readNickName(QString nick)//с 1-го окна
 {
     myNickName=nick;
+    setWindowTitle(myNickName);
     SendToServerNickName(myNickName);
+
     //QMap<QString, QTcpSocket*> forTable;
-    //forTable.insert(myNickName, socket);
+   // forTable.insert(myNickName, socket);
     //EditTable();
 }
 
@@ -136,6 +157,18 @@ void MainWindow::on_lineEdit_returnPressed()
     on_pushButton_2_clicked();
 }
 
+
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+    QMainWindow::resizeEvent(event);
+    saveSettings();
+}
+
+void MainWindow::moveEvent(QMoveEvent* event)
+{
+    QMainWindow::moveEvent(event);
+    saveSettings();
+}
 
 void MainWindow::on_tableWidget_cellDoubleClicked(int row, int column)
 {
