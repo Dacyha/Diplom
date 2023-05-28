@@ -40,6 +40,8 @@ private:
     void SendToServer(QString str, QString myNickName);
     void SendToServerNickName(QString myNickName);
     void EditTable();
+    void resizeEvent(QResizeEvent*);
+    void moveEvent(QMoveEvent*);
 
 public slots:
     void slotReadyRead();

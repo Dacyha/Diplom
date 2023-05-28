@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent):
 {
     ui->setupUi(this);
 
-    settings = new QSettings("settings.ini", QSettings::IniFormat,  this);
+    settings = new QSettings("D:/qt project/Diplom/client/settings.ini", QSettings::IniFormat,  this);
     loadSettings();
 
     socket = new QTcpSocket(this);
@@ -28,12 +28,17 @@ MainWindow::~MainWindow()
 
 void MainWindow::saveSettings()
 {
+    //settings->beginGroup(objectName());
     settings->setValue("geometry", geometry());
+    //settings->endGroup();
 }
 
 void MainWindow::loadSettings()
 {
-    setGeometry(settings->value("geometry", QRect(300, 300, 300, 300)).toRect());
+     //settings->beginGroup(objectName());
+     setGeometry(settings->value("geometry", QRect(300, 300, 300, 300)).toRect());
+     //setGeometry(QRect(600, 300, 600, 600));
+     //settings->endGroup();
 }
 
 void MainWindow::SendToServer(QString str, QString myNickName)
@@ -152,6 +157,18 @@ void MainWindow::on_lineEdit_returnPressed()
     on_pushButton_2_clicked();
 }
 
+
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+    QMainWindow::resizeEvent(event);
+    saveSettings();
+}
+
+void MainWindow::moveEvent(QMoveEvent* event)
+{
+    QMainWindow::moveEvent(event);
+    saveSettings();
+}
 
 void MainWindow::on_tableWidget_cellDoubleClicked(int row, int column)
 {

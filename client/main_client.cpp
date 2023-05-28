@@ -10,7 +10,8 @@ int main(int argc, char *argv[])
 
         RegistrationWindow r;
         r.show();
-        MainWindow m;
+        //MainWindow m;
+        //m.show();
 
     return a.exec();
 }

@@ -7,7 +7,7 @@ RegistrationWindow::RegistrationWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    settings = new QSettings("settings.ini", QSettings::IniFormat,  this);
+    settings = new QSettings("D:/qt project/Diplom/client/settings.ini", QSettings::IniFormat,  this);
     loadSettings();
     mainWindow = new MainWindow;
     connect(this, &RegistrationWindow::sendNickName, mainWindow, &MainWindow::readNickName);
