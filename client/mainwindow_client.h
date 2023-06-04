@@ -7,6 +7,7 @@
 #include<QMap>
 #include<QSettings>
 #include<QList>
+#include <QDir>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -35,13 +36,11 @@ private:
     QTcpSocket *socket;
     QByteArray Data;
     QString myNickName;
-   //QMap<QString, QTcpSocket*> forTable;
     QSettings* settings;
     void SendToServer(QString str, QString myNickName);
     void SendToServerNickName(QString myNickName);
-    void EditTable();
-    void resizeEvent(QResizeEvent*);
-    void moveEvent(QMoveEvent*);
+    void closeEvent(QCloseEvent *event);
+    void FormSettings();
 
 public slots:
     void slotReadyRead();

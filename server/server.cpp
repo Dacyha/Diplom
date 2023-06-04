@@ -1,5 +1,4 @@
 #include "server.h"
-#include<QDataStream>
 
 Server::Server()
 {
@@ -11,6 +10,7 @@ Server::Server()
     {
         qDebug() << "error Start";
     }
+     id = 0;
 }
 
 void Server::incomingConnection(qintptr socketDescriptor)
@@ -26,8 +26,6 @@ void Server::incomingConnection(qintptr socketDescriptor)
 void Server::slotReadyRead()
 {
     socketRead = (QTcpSocket*)sender();
-    //QByteArray  readCode = socket->read(6);
-    //qDebug() << readCode.toInt();
     QDataStream in(socketRead);
     in.setVersion(QDataStream::Qt_5_12);
     if(in.status() == QDataStream::Ok)
@@ -48,6 +46,7 @@ void Server::slotReadyRead()
             case 2:
                 in >> time >> nickNameClient >> str;
                 qDebug()<< "Client send message: " << time  << nickNameClient <<": "<< str << socketRead;
+                EditJsonFile(time, nickNameClient, str);
                 SendToClient(str);
                 break;
             default:
@@ -107,6 +106,36 @@ void Server::SendClientDB()
     {
         qDebug() << "DataStream error";
     }
+}
+
+void Server::EditJsonFile(QTime time, QString nickNameClient, QString str)
+{
+
+    QString dir("C:/Users/" + QDir::home().dirName() + "/Documents/" + QCoreApplication::applicationName()+ "/server");
+    if (!QDir(dir).exists())
+    {
+        QDir().mkdir(dir);
+    }
+
+    QFile fileJson(dir + "/messages.json");
+
+        if (fileJson.open(QIODevice::WriteOnly |QIODevice::Append))//если файла нет, он будет создан |QIODevice::Append
+{
+        QJsonArray  recordObject;
+        QJsonArray  recordObjectToFile;
+        QJsonObject objObject;
+        QJsonObject objObjectToFile;
+        id++;
+        objObject.insert("id", id);
+        objObject.insert("dateTime", time.toString());
+        objObject.insert("nickName", nickNameClient);
+        objObject.insert("text", str);
+        objObjectToFile["texts"] = objObject;
+        recordObject.append(objObjectToFile);
+        QJsonDocument doc(recordObject);
+        fileJson.write(QJsonDocument(doc).toJson(QJsonDocument::Indented));
+        fileJson.close();
+  }
 }
 
 void Server::SendToClient(QString str)

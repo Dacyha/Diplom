@@ -7,10 +7,13 @@ RegistrationWindow::RegistrationWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    settings = new QSettings("D:/qt project/Diplom/client/settings.ini", QSettings::IniFormat,  this);
+     QString settingsDir = "C:/Users/" + QDir::home().dirName() + "/Documents/" + QApplication::applicationName() + "/settings.ini";
+    settings = new QSettings(settingsDir, QSettings::IniFormat,  this);
     loadSettings();
+
     mainWindow = new MainWindow;
     connect(this, &RegistrationWindow::sendNickName, mainWindow, &MainWindow::readNickName);
+
     if (myNickName != "")
     {
         ui->lineEdit->setText(myNickName);

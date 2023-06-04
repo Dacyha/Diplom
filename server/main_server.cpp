@@ -4,6 +4,9 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+    QCoreApplication::setOrganizationName("Dacyha");
+    QCoreApplication::setApplicationName("Baheriamma");
+
     Server s;
     return a.exec();
 }

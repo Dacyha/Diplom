@@ -1,5 +1,6 @@
 #include "mainwindow_client.h"
 #include "ui_mainwindow_client.h"
+#include <QMouseEvent>
 
 MainWindow::MainWindow(QWidget *parent):
     QMainWindow(parent),
@@ -7,7 +8,8 @@ MainWindow::MainWindow(QWidget *parent):
 {
     ui->setupUi(this);
 
-    settings = new QSettings("D:/qt project/Diplom/client/settings.ini", QSettings::IniFormat,  this);
+    QString settingsDir = "C:/Users/" + QDir::home().dirName() + "/Documents/" + QApplication::applicationName() + "/settings.ini";
+    settings = new QSettings(settingsDir, QSettings::IniFormat,  this);
     loadSettings();
 
     socket = new QTcpSocket(this);
@@ -15,30 +17,22 @@ MainWindow::MainWindow(QWidget *parent):
     connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);
     socket->connectToHost("127.0.0.1", 8888);
 
-    ui->tableWidget->verticalHeader()->hide();// перенести в подобающее место(туда где буду настраивать размер элементов)
-    ui->tableWidget->horizontalHeader()->hide();// перенести в подобающее место
+    FormSettings();
 }
 
 MainWindow::~MainWindow()
 {
-    saveSettings();
-    socket->disconnectFromHost();
     delete ui;
 }
 
 void MainWindow::saveSettings()
 {
-    //settings->beginGroup(objectName());
     settings->setValue("geometry", geometry());
-    //settings->endGroup();
 }
 
 void MainWindow::loadSettings()
 {
-     //settings->beginGroup(objectName());
-     setGeometry(settings->value("geometry", QRect(300, 300, 300, 300)).toRect());
-     //setGeometry(QRect(600, 300, 600, 600));
-     //settings->endGroup();
+     setGeometry(settings->value("geometry", QRect(800, 400, 400, 300)).toRect());
 }
 
 void MainWindow::SendToServer(QString str, QString myNickName)
@@ -55,7 +49,7 @@ void MainWindow::SendToServer(QString str, QString myNickName)
     }
     else
     {
-         ui->textBrowser->append("read error");// убрать
+         //ui->textBrowser->append("read error");// убрать
     }
 }
 
@@ -105,7 +99,6 @@ void MainWindow::slotReadyRead()
             case 2:
 
                 in >> time >> nickNameClient >> str;
-                //QTcpSocket *socketRead = (QTcpSocket*)sender();
                 if (myNickName == nickNameClient)
                 {
                     ui->textBrowser->append(time.toString() + "\n" + "Я: "+ str+ "\n");
@@ -132,18 +125,6 @@ void MainWindow::readNickName(QString nick)//с 1-го окна
     myNickName=nick;
     setWindowTitle(myNickName);
     SendToServerNickName(myNickName);
-
-    //QMap<QString, QTcpSocket*> forTable;
-   // forTable.insert(myNickName, socket);
-    //EditTable();
-}
-
-void MainWindow::EditTable()
-{
-    //QTableWidgetItem *newItem = new QTableWidgetItem();
-    //QString oleg = forTable.key(socket);
-    //newItem->setText(forTable.key(socket));
-    //ui->tableWidget->setItem(0,0, newItem);
 }
 
 void MainWindow::on_pushButton_2_clicked()
@@ -157,17 +138,16 @@ void MainWindow::on_lineEdit_returnPressed()
     on_pushButton_2_clicked();
 }
 
-
-void MainWindow::resizeEvent(QResizeEvent* event)
+void MainWindow::closeEvent(QCloseEvent*)
 {
-    QMainWindow::resizeEvent(event);
     saveSettings();
+    socket->disconnectFromHost();
 }
 
-void MainWindow::moveEvent(QMoveEvent* event)
+void MainWindow::FormSettings()
 {
-    QMainWindow::moveEvent(event);
-    saveSettings();
+    ui->tableWidget->verticalHeader()->hide();
+    ui->tableWidget->horizontalHeader()->hide();
 }
 
 void MainWindow::on_tableWidget_cellDoubleClicked(int row, int column)
